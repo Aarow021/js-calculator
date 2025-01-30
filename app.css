@@ -20,6 +20,7 @@ body, html {
     position: relative;
     top: 50%;
     left: 50%;
+    transform: translate(-50%, -50%)
 }
 
 .card {
@@ -29,14 +30,26 @@ body, html {
     width: fit-content;
 }
 
-.calc-choice-container button {
+
+#basic-calc-container {
+    text-align: center;
+}
+
+.button-1 {
     padding: 1rem;
     background: black;
     border: solid 1px white;
     border-radius: 5px;
     color: white;
+    transition: 100ms;
 }
 
-.output-container {
-    text-align: center;
+.button-1:hover {
+    background-color: rgb(38, 38, 38);
+}
+
+.button-1:active {
+    background-color: rgb(255, 255, 255);
+    border-color: black;
+    color: black;
 }

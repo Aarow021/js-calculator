@@ -8,16 +8,24 @@
 </head>
 <body>
     <div class="page-wrapper">
-        <section class="calc-choice-container center card">
+        <section id="calc-choice-container" class="center card">
             <h2>Calculator Type</h2>
-            <button id="choice-basic">Basic</button>
-            <button id="choice-advanced">Advanced</button>
+            <button id="choice-basic" class="button-1">Basic</button>
+            <button id="choice-advanced" class="button-1">Advanced</button>
             
         </section>
-        <section class="output-container center card hidden">
+        <section id="basic-calc-container" class="center card hidden">
             <h2>Result</h2>
             <p id="basic-output"></p>
-            <button class="menu">Menu</button>
+            <button class="menu button-1">Menu</button>
+        </section>
+        <section id="advanced-calc-container" class="hidden">
+            <div id="calculator">
+                <div class="screen">
+                    <p class="advanced-output">0</p>
+                </div>
+
+            </div>
         </section>
     </div>
     <script src="app.js"></script>
