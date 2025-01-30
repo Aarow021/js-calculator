@@ -1,3 +1,9 @@
+
+@font-face {
+    font-family: digital;
+    src: url(Digital7Mono.ttf);
+}
+
 * {
     box-sizing: border-box;
 }
@@ -35,6 +41,7 @@ body, html {
     text-align: center;
 }
 
+
 .button-1 {
     padding: 1rem;
     background: black;
@@ -52,4 +59,68 @@ body, html {
     background-color: rgb(255, 255, 255);
     border-color: black;
     color: black;
+}
+
+#advanced-calc-container {
+    width: fit-content;
+}
+
+#calculator {
+    display: flex;
+    flex-flow: row wrap;
+    width: 20rem;
+    background-color: rgb(72, 75, 116);
+    padding: 2rem;
+    border-radius: 10px;
+}
+
+.screen {
+    width: 100%;
+    background-color: aquamarine;
+    padding: .5rem 1rem;
+    margin-bottom: 1rem;
+}
+
+#advanced-output {
+    font-family: 'digital';
+    font-size: 2em;
+    margin: 0;
+}
+
+#calculator button {
+    border-radius: 2px 2px 4px 4px;
+    width: calc(95%/5);
+    height: 2.5rem;
+    margin-bottom: 5px;
+    color: white;
+    background-color: rgb(50, 50, 50);
+    text-align: center;
+    border: none;
+    border-right: solid 2px black;
+    border-bottom: solid 2px black;
+    user-select: none;
+    transition: 20ms ease;
+}
+
+#calculator button:active {
+    filter: brightness(.8);
+    transform: translate(1px, 1px);
+    border: none;
+}
+
+#calculator .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+    justify-content: space-between;
+}
+
+#calculator .buttons .wrapper {
+    width: 100%;
+    position: relative;
+}
+
+[value=off] {
+    margin-left: auto;
+    padding: 0;
 }
