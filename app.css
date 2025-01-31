@@ -128,7 +128,7 @@ h2 {
 #calculator::after {
     z-index: 0;
     mix-blend-mode: hard-light;
-    opacity: 15%;
+    opacity: 20%;
     background-image: url(images/plastic_3.jpg);
 }
 
