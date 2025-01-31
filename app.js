@@ -1,8 +1,9 @@
 window.addEventListener('DOMContentLoaded', () => {
 
-    let currentOperator = '';
+    let currentOperator = '+';
     let displayValue = '';    //Current value being displayed on screen
     let currentValue = 0;     //Current value of the calculation
+    let lastAction = '';      //Records the last calculator button pressed
     
     //Rounds a number to a given number of decimal places
     function round(num, place) {
@@ -28,6 +29,25 @@ window.addEventListener('DOMContentLoaded', () => {
         if (operator === '-') return a - b;
         if (operator === '*') return a * b;
         if (operator === '/') return a / b;
+        if (operator === 'sqrt') return a ** (1 / b);
+    }
+
+    //Refreshes the calculator display with current values
+    function updateDisplay(value=displayValue) {
+        let prefix = ' ';
+        let roundedVal = value.substring(0, 15)
+        if (value.substring(0, 1) === '-') {
+            prefix = '-';
+            roundedVal = roundedVal.substring(1);
+        }
+        document.getElementById('advanced-output').textContent = prefix + roundedVal;
+    }
+
+    function resetCalc() {
+        displayValue = '0';
+        currentOperator = '+';
+        currentValue = 0;
+        updateDisplay();
     }
     
     //Runs the basic calculator (prompt based)
@@ -69,53 +89,62 @@ window.addEventListener('DOMContentLoaded', () => {
     function displayAdd(number) {
         if (displayValue.length < 15) {
             displayValue += number;
-            document.getElementById('advanced-output').textContent = displayValue;
+            updateDisplay();
         }
     }
 
     //Calculates display value and current value
-    function advancedCalc() {
-        if (!currentOperator) {return}
-        value = calc(currentValue, Number(displayValue), operator);
+    function advancedCalc(a=currentValue, b=Number(displayValue), operator=currentOperator) {
+        return calc(a, b, operator);
     }
 
-    //Adds event listeners to the calculator buttons
-    function initAdvancedCalc() {
-
-        let buttons = document.querySelectorAll('#calculator .buttons button');
-
-        for (let button of buttons) {
-            let value = button.value;
-
-            //Adds number button event listeners
-            if (Number(value) == value) {
-                button.addEventListener('click', () => {
-                    displayAdd(value);
-                })
-            } else if (value === 'c') { //Clears display
-                button.addEventListener('click', () => {
-                    displayValue = '';
-                    document.getElementById('advanced-output').textContent = 0;
-                })
-            } else if (value === 'ce') { //Clears display and stored values
-                button.addEventListener('click', () => {
-                    displayValue = '';
-                    currentValue = 0;
-                    currentOperator = '';
-                    document.getElementById('advanced-output').textContent = 0;
-                })
-            } else if (value === '.') { //Decimal button
-                button.addEventListener('click', () => {
-                    if (!displayValue.includes('.')) {displayAdd(value)};
-                })
-            } else if (['+', '-', '*', '/'].includes(value)) { //Operator buttons
-                button.addEventListener('click', () => {
-                    displayValue = '';
-                    advancedCalc();
-                    document.getElementById('advanced-output').textContent = 0;
-                    operator = value;
-                })
+    //Handles what happens when a calculator button is pressed
+    function buttonHandler(button) {
+        let value = button.value;
+        if (Number(value) == value) { //Number buttons
+            if (displayValue === '0' && value != '0') {
+                displayValue = '';
             }
+            displayAdd(value);
+        } else if (value === 'c') { //Clears display
+            displayValue = '0';
+            updateDisplay();
+        } else if (value === 'ce') { //Clears display and stored values
+            resetCalc();
+        } else if (value === '.') { //Decimal button
+            if (!displayValue.includes('.')) {displayAdd(value)};
+        } else if (['+', '-', '*', '/'].includes(value)) { //Operation buttons
+            if (lastAction === value || Number(lastAction) == lastAction) {
+                let newValue = advancedCalc();
+                currentValue = newValue;
+                displayValue = '0';
+                updateDisplay(currentValue.toString());
+            }
+            currentOperator = value;
+        } else if (value === '+-') {
+            if (displayValue.includes('-')) {
+                displayValue = displayValue.substring(1);
+            } else {
+                displayValue = '-' + displayValue;
+            }
+            updateDisplay();
+        } else if (value === '=') {
+            let newValue = advancedCalc();
+            currentValue = newValue;
+            displayValue = '0';
+            updateDisplay(currentValue.toString());
+        }
+
+        lastAction = value; //Records the current action for use on next button press
+    }
+
+    //Adds onClick event to the calculator buttons
+    function initAdvancedCalc() {
+        let buttons = document.querySelectorAll('#calculator .buttons button');
+        for (let button of buttons) {
+            button.addEventListener('click', (e) => {
+                buttonHandler(e.target);
+            })
         }
     }
 
@@ -126,10 +155,14 @@ window.addEventListener('DOMContentLoaded', () => {
         basicCalc();
     })
 
+    //Sets up advanced calculator settings
+    initAdvancedCalc();
+
+    //Goes to advanced calculator and resets it
     let choiceAdvanced = document.getElementById('choice-advanced');
     choiceAdvanced.addEventListener('click', () => {
+        resetCalc();
         goToPage('advanced-calc-container');
-        initAdvancedCalc();
     })
 
     //makes all menu buttons go to menu when clicked

@@ -11,6 +11,7 @@
 body, html {
     margin: 0;
     height: 100%;
+    overflow: hidden;
 }
 
 .page-wrapper {
@@ -34,6 +35,10 @@ body, html {
     border: solid 2px black;
     border-radius: 1rem;
     width: fit-content;
+}
+
+.slide:not(.hidden).center {
+    animation: slide-up 600ms ease;
 }
 
 
@@ -71,7 +76,9 @@ body, html {
     width: 20rem;
     background-color: rgb(72, 75, 116);
     padding: 2rem;
-    border-radius: 10px;
+    border-radius: 13px;
+    box-shadow: inset 1px 1px 8px rgba(0, 0, 0, 0.75),
+                inset -1px -1px 8px rgba(0, 0, 0, 0.75);
 }
 
 .screen {
@@ -79,12 +86,25 @@ body, html {
     background-color: aquamarine;
     padding: .5rem 1rem;
     margin-bottom: 1rem;
+    position: relative;
+    font-family: 'digital';
+    font-size: 2em;
+    box-shadow: inset 0 0 4px black;
+    border-radius: 3px;
+}
+
+.screen::before {
+    content: '-888888888888888';
+    position: absolute;
+    opacity: 4%;
+
 }
 
 #advanced-output {
-    font-family: 'digital';
-    font-size: 2em;
     margin: 0;
+    position: relative;
+    z-index: 1;
+    white-space: pre;
 }
 
 #calculator button {
@@ -123,4 +143,9 @@ body, html {
 [value=off] {
     margin-left: auto;
     padding: 0;
+}
+
+@keyframes slide-up {
+    from {transform: translate(-50%, 50vh);}
+    to {transform: translate(-50%, -50%);}
 }
