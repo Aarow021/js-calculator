@@ -1,9 +1,10 @@
 window.addEventListener('DOMContentLoaded', () => {
 
-    let currentOperator = '+';
+    let currentOperator = ' ';
     let displayValue = '';    //Current value being displayed on screen
     let currentValue = 0;     //Current value of the calculation
     let lastAction = '';      //Records the last calculator button pressed
+    let pendingValue = 0;
     
     //Rounds a number to a given number of decimal places
     function round(num, place) {
@@ -35,17 +36,39 @@ window.addEventListener('DOMContentLoaded', () => {
     //Refreshes the calculator display with current values
     function updateDisplay(value=displayValue) {
         let prefix = ' ';
-        let roundedVal = value.substring(0, 15)
+        let exponent = '';
+        let numVal = Number(value);
+        if (isNaN(numVal) || Math.abs(numVal) == Infinity) {
+            document.getElementById('advanced-output').textContent = ' -E-';
+            document.getElementById('notation').textContent = ''
+            return;
+        }
+        
+        let roundedVal = String(round(numVal, 12)).substring(0, Math.min(14, value.length));
+
+        if (roundedVal.length > 15) {
+            exponent = Math.floor(Math.log10(numVal));
+            numVal /= 10 ** exponent;
+        }
+
         if (value.substring(0, 1) === '-') {
             prefix = '-';
             roundedVal = roundedVal.substring(1);
         }
+
+        if (roundedVal.substring(roundedVal.length-1) === '.') {
+            roundedVal = roundedVal.substring(0, roundedVal.length-1);
+        }
+
         document.getElementById('advanced-output').textContent = prefix + roundedVal;
+        document.getElementById('notation').textContent = String(exponent || '');
     }
 
     function resetCalc() {
         displayValue = '0';
-        currentOperator = '+';
+        currentOperator = '';
+        lastAction = '';
+        pendingValue = 0;
         currentValue = 0;
         updateDisplay();
     }
@@ -94,7 +117,8 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     //Calculates display value and current value
-    function advancedCalc(a=currentValue, b=Number(displayValue), operator=currentOperator) {
+    function advancedCalc(a=currentValue, b=pendingValue, operator=currentOperator) {
+        if (operator === '') {return b}
         return calc(a, b, operator);
     }
 
@@ -102,37 +126,45 @@ window.addEventListener('DOMContentLoaded', () => {
     function buttonHandler(button) {
         let value = button.value;
         if (Number(value) == value) { //Number buttons
-            if (displayValue === '0' && value != '0') {
-                displayValue = '';
-            }
             displayAdd(value);
+            pendingValue = Number(displayValue);
+            // if (lastAction === '') {currentValue = pendingValue}
         } else if (value === 'c') { //Clears display
             displayValue = '0';
+            pendingValue = 0;
             updateDisplay();
         } else if (value === 'ce') { //Clears display and stored values
             resetCalc();
         } else if (value === '.') { //Decimal button
             if (!displayValue.includes('.')) {displayAdd(value)};
         } else if (['+', '-', '*', '/'].includes(value)) { //Operation buttons
-            if (lastAction === value || Number(lastAction) == lastAction) {
+            if (Number(lastAction) == lastAction || lastAction === '=') {
                 let newValue = advancedCalc();
                 currentValue = newValue;
                 displayValue = '0';
                 updateDisplay(currentValue.toString());
             }
             currentOperator = value;
-        } else if (value === '+-') {
+        } else if (value === '+-') { //Toggles negativity of number
             if (displayValue.includes('-')) {
                 displayValue = displayValue.substring(1);
             } else {
                 displayValue = '-' + displayValue;
             }
+            pendingValue = Number(displayValue);
             updateDisplay();
-        } else if (value === '=') {
+        } else if (value === '=') { //Calculates [currentValue (operator) pendingValue]
             let newValue = advancedCalc();
             currentValue = newValue;
-            displayValue = '0';
+            displayValue = newValue.toString();
+            updateDisplay();
+        } else if (value === 'sqrt') {
+            let newValue = pendingValue ** 0.5
+            currentValue = newValue;
+            pendingValue = currentValue;
+            displayValue = newValue.toString();
             updateDisplay(currentValue.toString());
+            currentOperator = '';
         }
 
         lastAction = value; //Records the current action for use on next button press

@@ -17,6 +17,8 @@ body, html {
 .page-wrapper {
     width: 100%;
     height: 100%;
+    background-image: url('images/wood_bg.jpg');
+    background-size: cover;
 }
 
 .hidden {
@@ -35,6 +37,7 @@ body, html {
     border: solid 2px black;
     border-radius: 1rem;
     width: fit-content;
+    background-color: white;
 }
 
 .slide:not(.hidden).center {
@@ -84,17 +87,19 @@ body, html {
 .screen {
     width: 100%;
     background-color: aquamarine;
-    padding: .5rem 1rem;
+    padding: .5rem;
     margin-bottom: 1rem;
     position: relative;
     font-family: 'digital';
     font-size: 2em;
     box-shadow: inset 0 0 4px black;
     border-radius: 3px;
+    display: flex;
+    align-items: start;
 }
 
 .screen::before {
-    content: '-888888888888888';
+    content: '-88888888888888';
     position: absolute;
     opacity: 4%;
 
@@ -105,10 +110,25 @@ body, html {
     position: relative;
     z-index: 1;
     white-space: pre;
+    width: 8em;
+    padding: 0;
+}
+
+#notation {
+    font-size: .5em;
+    margin: 0;
+    position: relative;
+    width: calc(.5em * 3);
+}
+
+#notation::before {
+    content: '-88';
+    position: absolute;
+    opacity: 4%;
 }
 
 #calculator button {
-    border-radius: 2px 2px 4px 4px;
+    border-radius: 4px 4px 10px 10px;
     width: calc(95%/5);
     height: 2.5rem;
     margin-bottom: 5px;
