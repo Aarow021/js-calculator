@@ -64,7 +64,7 @@ h2 {
 }
 
 .falling {
-    animation: fall 600ms ease;
+    animation: fall 800ms linear;
 }
 
 .showing {
@@ -128,7 +128,7 @@ h2 {
 #calculator::after {
     z-index: 0;
     mix-blend-mode: hard-light;
-    opacity: 30%;
+    opacity: 15%;
     background-image: url(images/plastic_3.jpg);
 }
 
@@ -150,7 +150,7 @@ h2 {
 .screen {
     width: 100%;
     background-color: aquamarine;
-    padding: .5rem;
+    padding: .5rem .25rem .5rem .25rem;
     margin-bottom: 1rem;
     position: relative;
     font-family: 'digital';
@@ -159,6 +159,7 @@ h2 {
     border-radius: 3px;
     display: flex;
     align-items: start;
+    justify-content: space-between;
     outline: solid 5px rgb(49, 51, 80);
     z-index: 1;
     overflow: hidden;
@@ -176,7 +177,6 @@ h2 {
     position: relative;
     z-index: 1;
     white-space: pre;
-    width: 8em;
     padding: 0;
     text-align: end;
 }
@@ -185,13 +185,17 @@ h2 {
     font-size: .5em;
     margin: 0;
     position: relative;
-    width: calc(.5em * 3);
+    width: calc(.5em * 4);
+    text-align: end;
 }
 
 #notation::before {
-    content: '-88';
+    content: '-888';
     position: absolute;
     opacity: 4%;
+    text-align: end;
+    width: fit-content;
+    right: 0;
 }
 
 #calculator button {

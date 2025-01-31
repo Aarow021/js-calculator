@@ -50,6 +50,16 @@ window.addEventListener('DOMContentLoaded', () => {
             value = '0' + value;
         }
 
+        if (value.startsWith('e')) {
+            value = '1' + value;
+        }
+
+        //Gets rid of leading 0's
+        if (value.startsWith('0') && value.indexOf('.') != 1) {
+            value = String(Number(value));
+            displayValue = value;
+        }
+
         if (value === '') {
             value = '0';
         }
@@ -72,7 +82,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
         
         if (!useRaw && Math.abs(numVal) >= 10e13 || (Math.abs(numVal) <= 10e-7 && Math.abs(numVal) != 0)) {
-            exponent = Math.floor(Math.log10(numVal));
+            exponent = Math.floor(Math.log10(Math.abs(numVal)));
             numVal /= 10 ** exponent;
         }
         
@@ -158,6 +168,9 @@ window.addEventListener('DOMContentLoaded', () => {
     function buttonHandler(button) {
         let value = button.value;
         if (Number(value) == value) { //Number buttons
+            if (['+', '-', '*', '/'].includes(lastAction)) {
+                displayValue = '';
+            }
             displayAdd(value);
             pendingValue = Number(displayValue);
         } else if (value === 'c') { //Clears display
@@ -171,7 +184,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 displayAdd(value);
             }
         } else if (['+', '-', '*', '/'].includes(value)) { //Operation buttons
-            if (Number(lastAction) == lastAction || lastAction === '=' || lastAction === '+=') {
+            if (lastAction != '=' && Number(lastAction) == lastAction || lastAction === '+=') {
                 let newValue = advancedCalc();
                 currentValue = newValue;
                 displayValue = '';
@@ -179,10 +192,13 @@ window.addEventListener('DOMContentLoaded', () => {
             }
             currentOperator = value;
         } else if (value === '+-') { //Toggles negativity of number
-            if (displayValue.includes('-')) {
+            if (displayValue.startsWith('-')) {
                 displayValue = displayValue.substring(1);
             } else {
                 displayValue = '-' + (displayValue || '0');
+            }
+            if (['+', '-', '*', '/'].includes(lastAction)) {
+                displayValue = '';
             }
             pendingValue = Number(displayValue);
             updateDisplay(displayValue);
