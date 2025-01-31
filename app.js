@@ -4,7 +4,7 @@ window.addEventListener('DOMContentLoaded', () => {
     let displayValue = '';    //Current value being displayed on screen
     let currentValue = 0;     //Current value of the calculation
     let lastAction = '';      //Records the last calculator button pressed
-    let pendingValue = 0;
+    let pendingValue = 0;     //Temp value to be calculated with currentValue later
     
     //Rounds a number to a given number of decimal places
     function round(num, place) {
@@ -12,7 +12,7 @@ window.addEventListener('DOMContentLoaded', () => {
         return Math.round(num * 10**place) / 10**place || num;
     }
 
-    //Hides all direct children of page wrapper except for the next 'page'
+    //Hides all direct children of page wrapper except for the next 'page' (animated too)
     function goToPage(name) {
         let pageChildren = document.querySelectorAll('.page-wrapper > *');
         for (child of pageChildren) {
@@ -39,17 +39,23 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //Refreshes the calculator display with current values
     function updateDisplay(value=displayValue, useRaw=false) {
+
+        //useRaw displays the number without calculations
+
         let prefix = ' ';
         let exponent = '';
 
+        //Adds screen flicker effect when changing values
         for (let element of document.querySelectorAll('.screen > *')) {
             element.classList.add('showing');
         }
 
+        //Turns '.1234' into '0.1234'
         if (value.substring(0, 1) === '.') {
             value = '0' + value;
         }
 
+        //Turns values like 'e12' into '1e12'
         if (value.startsWith('e')) {
             value = '1' + value;
         }
@@ -60,47 +66,59 @@ window.addEventListener('DOMContentLoaded', () => {
             displayValue = value;
         }
 
+        //Default value is 0
         if (value === '') {
             value = '0';
         }
 
+        //Allows screen to display '-0', math would get rid of the '-' otherwise
         if (value === '-0' || value === '-') {
             document.getElementById('advanced-output').textContent = '-0';
             return;
         }
 
+        //Allows screen to display '-0.', math would get rid of the '-' otherwise
         if (value === '-0.') {
             document.getElementById('advanced-output').textContent = '-0.';
             return;
         }
 
+        //Handles invalid numbers
         let numVal = Number(value);
         if (isNaN(numVal) || Math.abs(numVal) == Infinity) {
+            displayValue = '-E-';
+            pendingValue = '-E-';
             document.getElementById('advanced-output').textContent = ' -E-';
-            document.getElementById('notation').textContent = ''
+            document.getElementById('notation').textContent = '';
             return;
         }
-        
+
+        //Adds scientific notation to really big (or small) numbers
         if (!useRaw && Math.abs(numVal) >= 10e13 || (Math.abs(numVal) <= 10e-7 && Math.abs(numVal) != 0)) {
             exponent = Math.floor(Math.log10(Math.abs(numVal)));
             numVal /= 10 ** exponent;
         }
         
+        //Cuts (rounds) the display number off after so many digits.
         let roundedVal = useRaw ? value : String(round(numVal, 12)).substring(0, Math.min(14, value.length));
 
+        //Adds '-' to beginning of the display if number is negative
         if (value.substring(0, 1) === '-') {
             prefix = '-';
             roundedVal = roundedVal.substring(1);
         }
 
+        //Gets rid of trailing decimal point if there is one
         if (roundedVal.substring(roundedVal.length-1) === '.' && !useRaw) {
             roundedVal = roundedVal.substring(0, roundedVal.length-1);
         }
     
+        //Applies changes to the document
         document.getElementById('advanced-output').textContent = prefix + roundedVal;
         document.getElementById('notation').textContent = String(exponent || '');
     }
 
+    //RResets the calculator display and variables
     function resetCalc() {
         displayValue = '';
         currentOperator = '';
@@ -119,23 +137,26 @@ window.addEventListener('DOMContentLoaded', () => {
         //Makes sure the input is a number
         while (Number.isNaN(firstNum)) {
             let input = prompt('Please enter the first number')
-            if (input === null) {toMenu(); return;}
+            if (input === null) {return;}
             firstNum = parseFloat(input);
         }
 
         //Makes sure the input is a valid operator
         while (!['+', '-', '*', '/'].includes(operator)) {
             let input = prompt('Please enter the operation (+, -, *, /)');
-            if (input === null) {toMenu(); return;}
+            if (input === null) {return;}
             operator = input
         }
 
         //Makes sure the input is a number
         while (Number.isNaN(secondNum)) {
             let input = prompt('Please enter the second number')
-            if (input === null) {toMenu(); return;}
+            if (input === null) {return;}
             secondNum = parseFloat(input);
         }
+
+        //Goes to result page
+        goToPage('basic-calc-container');
 
         //Calculates the numbers using chosen operator
         let outcome = calc(firstNum, secondNum, operator);
@@ -145,12 +166,15 @@ window.addEventListener('DOMContentLoaded', () => {
         outputElem.textContent = round(outcome, 8);
     }
 
-    //Adds a number to the calculator display
+    //Adds a number to the display value
     function displayAdd(number) {
+
+        //Stops user from entering more than a given amount of digits
         if (displayValue.length < 14 && displayValue != '-0') {
             displayValue += number;
         }
 
+        //Replaces a lone 0 with new number
         if (displayValue === '-0') {
             displayValue = number === '.' ? '-0' + number : '-' + number;
         }
@@ -207,7 +231,7 @@ window.addEventListener('DOMContentLoaded', () => {
             currentValue = newValue;
             displayValue = newValue.toString();
             updateDisplay();
-        } else if (value === 'sqrt') {
+        } else if (value === 'sqrt') { //Square root function
             let newValue = pendingValue ** 0.5
             currentValue = newValue;
             pendingValue = currentValue;
@@ -251,7 +275,6 @@ window.addEventListener('DOMContentLoaded', () => {
     //Makes choose basic button work when clicked
     let choiceBasic = document.getElementById('choice-basic');
     choiceBasic.addEventListener('click', () => {
-        goToPage('basic-calc-container');
         basicCalc();
     })
 
