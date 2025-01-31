@@ -145,6 +145,7 @@ h2 {
     opacity: 50%;
     width: 200%;
     background-image: url(images/scratch_1.jpg);
+    pointer-events: none;
 }
 
 .screen {
@@ -179,6 +180,11 @@ h2 {
     white-space: pre;
     padding: 0;
     text-align: end;
+}
+
+#advanced-output::selection {
+    background-color:coral;
+    color: white;
 }
 
 #notation {
