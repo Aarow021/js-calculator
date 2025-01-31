@@ -11,7 +11,11 @@
 body, html {
     margin: 0;
     height: 100%;
-    overflow: hidden;
+}
+
+h2 {
+    font-size: 3em;
+    margin: 1rem 0;
 }
 
 .page-wrapper {
@@ -19,10 +23,8 @@ body, html {
     height: 100%;
     background-image: url('images/wood_bg.jpg');
     background-size: cover;
-}
-
-.hidden {
-    display: none;
+    overflow: auto;
+    scrollbar-width: none;
 }
 
 .center {
@@ -38,17 +40,30 @@ body, html {
     border-radius: 1rem;
     width: fit-content;
     background-color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.card button {
+    font-size: 2em;
+}
+
+.card p {
+    font-size: 2em;
+}
+
+.hidden {
+    display: none;
 }
 
 .slide:not(.hidden).center {
     animation: slide-up 600ms ease;
 }
 
-
 #basic-calc-container {
     text-align: center;
 }
-
 
 .button-1 {
     padding: 1rem;
@@ -80,8 +95,45 @@ body, html {
     background-color: rgb(72, 75, 116);
     padding: 2rem;
     border-radius: 13px;
+    position: relative;
     box-shadow: inset 1px 1px 8px rgba(0, 0, 0, 0.75),
                 inset -1px -1px 8px rgba(0, 0, 0, 0.75);
+    overflow: hidden;
+    transform: scale(1.5);
+}
+
+#calculator::after, #calculator button::after, .screen::after{
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    
+}
+
+#calculator::after {
+    z-index: 0;
+    mix-blend-mode: hard-light;
+    opacity: 30%;
+    background-image: url(images/plastic_3.jpg);
+}
+
+#calculator button::after {
+    z-index: 2;
+    mix-blend-mode: hard-light;
+    opacity: 20%;
+    background-image: url(images/plastic_2.jpg);
+}
+
+.screen::after {
+    z-index: 3;
+    mix-blend-mode: hard-light;
+    opacity: 50%;
+    width: 200%;
+    background-image: url(images/scratch_1.jpg);
 }
 
 .screen {
@@ -96,6 +148,9 @@ body, html {
     border-radius: 3px;
     display: flex;
     align-items: start;
+    outline: solid 5px rgb(49, 51, 80);
+    z-index: 1;
+    overflow: hidden;
 }
 
 .screen::before {
@@ -139,7 +194,10 @@ body, html {
     border-right: solid 2px black;
     border-bottom: solid 2px black;
     user-select: none;
+    position: relative;
+    z-index: 1;
     transition: 20ms ease;
+    overflow: hidden;
 }
 
 #calculator button:active {
@@ -163,6 +221,30 @@ body, html {
 [value=off] {
     margin-left: auto;
     padding: 0;
+}
+
+@media screen and (max-width: 550px) {
+    #calculator {
+        transform: scale(1);
+    }
+
+    h2 {
+        font-size: 2em;
+    }
+
+    .card button {
+        font-size: 2em;
+    }
+    
+    .card p {
+        font-size: 2em;
+    }
+}
+
+@media screen and (max-height: 550px) {
+    #calculator {
+        transform: scale(1);
+    }
 }
 
 @keyframes slide-up {

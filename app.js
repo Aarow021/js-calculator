@@ -44,12 +44,12 @@ window.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        let roundedVal = String(round(numVal, 12)).substring(0, Math.min(14, value.length));
-
-        if (roundedVal.length > 15) {
+        if (numVal >= 10e13) {
             exponent = Math.floor(Math.log10(numVal));
             numVal /= 10 ** exponent;
         }
+        
+        let roundedVal = String(round(numVal, 12)).substring(0, Math.min(14, value.length));
 
         if (value.substring(0, 1) === '-') {
             prefix = '-';
@@ -128,7 +128,6 @@ window.addEventListener('DOMContentLoaded', () => {
         if (Number(value) == value) { //Number buttons
             displayAdd(value);
             pendingValue = Number(displayValue);
-            // if (lastAction === '') {currentValue = pendingValue}
         } else if (value === 'c') { //Clears display
             displayValue = '0';
             pendingValue = 0;
