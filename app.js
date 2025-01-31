@@ -16,8 +16,12 @@ window.addEventListener('DOMContentLoaded', () => {
     function goToPage(name) {
         let pageChildren = document.querySelectorAll('.page-wrapper > *');
         for (child of pageChildren) {
-            child.classList.add('hidden');
+            if (!child.className.includes('hidden')) {
+                child.classList.add('hidden');
+                child.classList.add('falling');
+            }
         }
+        document.getElementById(name).classList.add('rising');
         document.getElementById(name).classList.remove('hidden');
     }
 
@@ -34,9 +38,17 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     //Refreshes the calculator display with current values
-    function updateDisplay(value=displayValue) {
+    function updateDisplay(value=displayValue, useRaw=false) {
         let prefix = ' ';
         let exponent = '';
+        if (value.substring(0, 1) === '.') {
+            value = '0' + value;
+        }
+
+        if (value === '' || value === '-0') {
+            value = '0';
+        }
+
         let numVal = Number(value);
         if (isNaN(numVal) || Math.abs(numVal) == Infinity) {
             document.getElementById('advanced-output').textContent = ' -E-';
@@ -44,19 +56,19 @@ window.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        if (numVal >= 10e13) {
+        if (Math.abs(numVal) >= 10e13 || Math.abs(numVal) <= 10e-7 && Math.abs(numVal) != 0) {
             exponent = Math.floor(Math.log10(numVal));
             numVal /= 10 ** exponent;
         }
         
-        let roundedVal = String(round(numVal, 12)).substring(0, Math.min(14, value.length));
+        let roundedVal = useRaw ? value : String(round(numVal, 12)).substring(0, Math.min(14, value.length));
 
         if (value.substring(0, 1) === '-') {
             prefix = '-';
             roundedVal = roundedVal.substring(1);
         }
 
-        if (roundedVal.substring(roundedVal.length-1) === '.') {
+        if (roundedVal.substring(roundedVal.length-1) === '.' && !useRaw) {
             roundedVal = roundedVal.substring(0, roundedVal.length-1);
         }
 
@@ -65,7 +77,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     function resetCalc() {
-        displayValue = '0';
+        displayValue = '';
         currentOperator = '';
         lastAction = '';
         pendingValue = 0;
@@ -110,10 +122,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //Adds a number to the calculator display
     function displayAdd(number) {
-        if (displayValue.length < 15) {
+        if (displayValue.length < 15 && displayValue != '-0') {
             displayValue += number;
-            updateDisplay();
         }
+
+        if (displayValue === '-0') {
+            displayValue = '-' + number
+        }
+
+        updateDisplay(displayValue, true);
     }
 
     //Calculates display value and current value
@@ -129,18 +146,20 @@ window.addEventListener('DOMContentLoaded', () => {
             displayAdd(value);
             pendingValue = Number(displayValue);
         } else if (value === 'c') { //Clears display
-            displayValue = '0';
+            displayValue = '';
             pendingValue = 0;
             updateDisplay();
         } else if (value === 'ce') { //Clears display and stored values
             resetCalc();
         } else if (value === '.') { //Decimal button
-            if (!displayValue.includes('.')) {displayAdd(value)};
+            if (!displayValue.includes('.')) {
+                displayAdd(value);
+            }
         } else if (['+', '-', '*', '/'].includes(value)) { //Operation buttons
-            if (Number(lastAction) == lastAction || lastAction === '=') {
+            if (Number(lastAction) == lastAction || lastAction === '=' || lastAction === '+=') {
                 let newValue = advancedCalc();
                 currentValue = newValue;
-                displayValue = '0';
+                displayValue = '';
                 updateDisplay(currentValue.toString());
             }
             currentOperator = value;
@@ -148,10 +167,10 @@ window.addEventListener('DOMContentLoaded', () => {
             if (displayValue.includes('-')) {
                 displayValue = displayValue.substring(1);
             } else {
-                displayValue = '-' + displayValue;
+                displayValue = '-' + (displayValue || 0);
             }
             pendingValue = Number(displayValue);
-            updateDisplay();
+            updateDisplay(displayValue, true);
         } else if (value === '=') { //Calculates [currentValue (operator) pendingValue]
             let newValue = advancedCalc();
             currentValue = newValue;
@@ -177,6 +196,19 @@ window.addEventListener('DOMContentLoaded', () => {
                 buttonHandler(e.target);
             })
         }
+    }
+
+    let pageChildren = document.querySelectorAll('.page-wrapper > *');
+    for (child of pageChildren) {
+        child.addEventListener('animationend', (e) => {
+            let animationName = e.animationName;
+            if (animationName === 'fall') {
+                e.target.classList.remove('falling');
+                e.target.classList.add('hidden');
+            } else if (animationName === 'rise') {
+                e.target.classList.remove('rising');
+            }
+        })
     }
 
     //Makes choose basic button work when clicked

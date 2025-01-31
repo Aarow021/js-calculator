@@ -11,6 +11,9 @@
 body, html {
     margin: 0;
     height: 100%;
+    background-image: url('images/wood_bg.jpg');
+    background-size: cover;
+    scrollbar-width: none;
 }
 
 h2 {
@@ -21,10 +24,7 @@ h2 {
 .page-wrapper {
     width: 100%;
     height: 100%;
-    background-image: url('images/wood_bg.jpg');
-    background-size: cover;
     overflow: auto;
-    scrollbar-width: none;
 }
 
 .center {
@@ -53,12 +53,16 @@ h2 {
     font-size: 2em;
 }
 
-.hidden {
+.hidden:not(.rising, .falling) {
     display: none;
 }
 
-.slide:not(.hidden).center {
-    animation: slide-up 600ms ease;
+.rising {
+    animation: rise 600ms ease;
+}
+
+.falling {
+    animation: fall 600ms ease;
 }
 
 #basic-calc-container {
@@ -92,12 +96,13 @@ h2 {
     display: flex;
     flex-flow: row wrap;
     width: 20rem;
-    background-color: rgb(72, 75, 116);
+    background-color: rgb(255, 255, 255);
     padding: 2rem;
     border-radius: 13px;
     position: relative;
     box-shadow: inset 1px 1px 8px rgba(0, 0, 0, 0.75),
-                inset -1px -1px 8px rgba(0, 0, 0, 0.75);
+                inset -1px -1px 8px rgba(0, 0, 0, 0.75),
+                8px 8px 8px black;
     overflow: hidden;
     transform: scale(1.5);
 }
@@ -124,7 +129,7 @@ h2 {
 #calculator button::after {
     z-index: 2;
     mix-blend-mode: hard-light;
-    opacity: 20%;
+    opacity: 40%;
     background-image: url(images/plastic_2.jpg);
 }
 
@@ -167,6 +172,7 @@ h2 {
     white-space: pre;
     width: 8em;
     padding: 0;
+    text-align: end;
 }
 
 #notation {
@@ -247,7 +253,12 @@ h2 {
     }
 }
 
-@keyframes slide-up {
-    from {transform: translate(-50%, 50vh);}
-    to {transform: translate(-50%, -50%);}
+@keyframes rise {
+    from {transform: translate(-50%, 50vh); position: absolute;}
+    to {transform: translate(-50%, -50%); position: absolute;}
+}
+
+@keyframes fall {
+    from {transform: translate(-50%, -50%); position: absolute;}
+    to {transform: translate(-50%, 100vh); position: absolute;}
 }
