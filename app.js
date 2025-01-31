@@ -41,12 +41,27 @@ window.addEventListener('DOMContentLoaded', () => {
     function updateDisplay(value=displayValue, useRaw=false) {
         let prefix = ' ';
         let exponent = '';
+
+        for (let element of document.querySelectorAll('.screen > *')) {
+            element.classList.add('showing');
+        }
+
         if (value.substring(0, 1) === '.') {
             value = '0' + value;
         }
 
-        if (value === '' || value === '-0') {
+        if (value === '') {
             value = '0';
+        }
+
+        if (value === '-0' || value === '-') {
+            document.getElementById('advanced-output').textContent = '-0';
+            return;
+        }
+
+        if (value === '-0.') {
+            document.getElementById('advanced-output').textContent = '-0.';
+            return;
         }
 
         let numVal = Number(value);
@@ -56,7 +71,7 @@ window.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        if (Math.abs(numVal) >= 10e13 || Math.abs(numVal) <= 10e-7 && Math.abs(numVal) != 0) {
+        if (!useRaw && Math.abs(numVal) >= 10e13 || (Math.abs(numVal) <= 10e-7 && Math.abs(numVal) != 0)) {
             exponent = Math.floor(Math.log10(numVal));
             numVal /= 10 ** exponent;
         }
@@ -71,7 +86,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (roundedVal.substring(roundedVal.length-1) === '.' && !useRaw) {
             roundedVal = roundedVal.substring(0, roundedVal.length-1);
         }
-
+    
         document.getElementById('advanced-output').textContent = prefix + roundedVal;
         document.getElementById('notation').textContent = String(exponent || '');
     }
@@ -122,12 +137,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //Adds a number to the calculator display
     function displayAdd(number) {
-        if (displayValue.length < 15 && displayValue != '-0') {
+        if (displayValue.length < 14 && displayValue != '-0') {
             displayValue += number;
         }
 
         if (displayValue === '-0') {
-            displayValue = '-' + number
+            displayValue = number === '.' ? '-0' + number : '-' + number;
         }
 
         updateDisplay(displayValue, true);
@@ -167,10 +182,10 @@ window.addEventListener('DOMContentLoaded', () => {
             if (displayValue.includes('-')) {
                 displayValue = displayValue.substring(1);
             } else {
-                displayValue = '-' + (displayValue || 0);
+                displayValue = '-' + (displayValue || '0');
             }
             pendingValue = Number(displayValue);
-            updateDisplay(displayValue, true);
+            updateDisplay(displayValue);
         } else if (value === '=') { //Calculates [currentValue (operator) pendingValue]
             let newValue = advancedCalc();
             currentValue = newValue;
@@ -188,6 +203,19 @@ window.addEventListener('DOMContentLoaded', () => {
         lastAction = value; //Records the current action for use on next button press
     }
 
+    //Handles animations
+    function animationHandler(e) {
+        let animationName = e.animationName;
+        if (animationName === 'fall') {
+            e.target.classList.remove('falling');
+            e.target.classList.add('hidden');
+        } else if (animationName === 'rise') {
+            e.target.classList.remove('rising');
+        } else if (animationName === 'show') {
+            e.target.classList.remove('showing');
+        }
+    }
+
     //Adds onClick event to the calculator buttons
     function initAdvancedCalc() {
         let buttons = document.querySelectorAll('#calculator .buttons button');
@@ -197,18 +225,11 @@ window.addEventListener('DOMContentLoaded', () => {
             })
         }
     }
-
-    let pageChildren = document.querySelectorAll('.page-wrapper > *');
-    for (child of pageChildren) {
-        child.addEventListener('animationend', (e) => {
-            let animationName = e.animationName;
-            if (animationName === 'fall') {
-                e.target.classList.remove('falling');
-                e.target.classList.add('hidden');
-            } else if (animationName === 'rise') {
-                e.target.classList.remove('rising');
-            }
-        })
+    
+    //Adds animation handler to top-level and other selected elements
+    let animatedElems = document.querySelectorAll('.page-wrapper > *, .screen > *');
+    for (element of animatedElems) {
+        element.addEventListener('animationend', animationHandler)
     }
 
     //Makes choose basic button work when clicked
